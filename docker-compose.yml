@@ -7,10 +7,9 @@ services:
       - "8001:8000"
     volumes:
       - .:/app
+      - static_volume:/app/staticfiles
     environment:
       - PYTHONUNBUFFERED=1
-    tty: true
-    stdin_open: true
     depends_on:
       - redis
 
@@ -19,10 +18,9 @@ services:
     command: celery -A config worker --loglevel=info --pool=solo
     volumes:
       - .:/app
+      - static_volume:/app/staticfiles
     environment:
       - PYTHONUNBUFFERED=1
-    tty: true
-    stdin_open: true
     depends_on:
       - redis
 
@@ -30,3 +28,6 @@ services:
     image: redis:7-alpine
     ports:
       - "6381:6379"
+
+volumes:
+  static_volume:
