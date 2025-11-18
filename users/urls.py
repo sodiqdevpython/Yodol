@@ -8,5 +8,6 @@ urlpatterns = [
     path('generate-new-verify/', views.GenerateNewVerifyView.as_view(), name='new-verify'),
     path('change-main-info/', views.ChangeUserMainInfoView.as_view(), name='change-main-info'),
     path('finish-profile/', views.ChangeProfilePicture.as_view(), name='finish-profile'),
+    path('login/', views.LoginView.as_view(), name='login'),
     path('logout/', TokenBlacklistView.as_view(), name='token_blacklist'),
 ]
