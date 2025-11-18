@@ -4,6 +4,8 @@ from django.utils.timezone import now
 from . import choices
 from .models import User, UserConfirmation
 import re
+from django.utils import timezone
+from datetime import timedelta
 from django.contrib.auth.hashers import check_password
 
 
@@ -22,8 +24,22 @@ class SignUpSerializer(serializers.ModelSerializer):
         return obj.token()
     
     def validate_email_or_phone(self, data):
-        if User.objects.filter(Q(email=data) | Q(phone_number=data)).exists():
-            raise serializers.ValidationError("Bu akkaunt allaqachon mavjud")
+        user = User.objects.filter(Q(email=data) | Q(phone_number=data)).last()
+        if user:
+            if user.auth_status != choices.AuthStatusChoice.New:
+                raise serializers.ValidationError("Bu akkaunt allaqachon mavjud")
+            
+            one_hour_ago = timezone.now() - timedelta(hours=1)
+            attempts = User.objects.filter(
+                Q(email=data) | Q(phone_number=data),
+                date_joined__gte=one_hour_ago
+            ).count()
+            
+            if attempts >= 3:
+                raise serializers.ValidationError(
+                    "1 soat ichida 3 martadan ko'proq ro'yxatdan o'tish mumkin emas"
+                )
+            
         
         if data[1:len(data)].isdigit():
             if not bool(re.match("^\\+?[1-9][0-9]{7,14}$", data)):
