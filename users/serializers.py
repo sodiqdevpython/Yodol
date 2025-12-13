@@ -161,3 +161,9 @@ class UserLoginSerializer(serializers.ModelSerializer):
         token = user.token()
         attrs['token'] = token
         return attrs
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['username', 'first_name', 'last_name', 'birth_date', 'gender', 'email', 'phone_number', 'profile_picture', 'auth_status', 'auth_type', 'is_premium']
+        

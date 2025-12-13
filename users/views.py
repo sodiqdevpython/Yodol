@@ -214,3 +214,49 @@ class LoginView(APIView):
                 }
             }, status=200
         )
+
+class ProfileInfoView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    
+    
+    @swagger_auto_schema(
+        operation_summary="Foydalanuvchi profili",
+        operation_description=(
+            "Autentifikatsiyadan o‘tgan foydalanuvchining "
+            "profil ma'lumotlarini qaytaradi."
+        ),
+        tags=["User authentication"],
+        responses={
+            200: openapi.Response(
+                description="Foydalanuvchi ma'lumotlari muvaffaqiyatli olindi",
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        "message": openapi.Schema(
+                            type=openapi.TYPE_STRING,
+                            example="Foydalanuvchi ma'lumotlari"
+                        ),
+                        "data": openapi.Schema(
+                            type=openapi.TYPE_OBJECT,
+                            properties={
+                                "id": openapi.Schema(type=openapi.TYPE_INTEGER, example=1),
+                                "username": openapi.Schema(type=openapi.TYPE_STRING, example="sodiq"),
+                                "email": openapi.Schema(type=openapi.TYPE_STRING, example="sodiq@gmail.com"),
+                            }
+                        ),
+                    }
+                )
+            ),
+            401: openapi.Response(
+                description="Autentifikatsiya qilinmagan"
+            )
+        }
+    )
+    def get(self, request):
+        ser = serializers.UserProfileSerializer(instance=request.user)
+        return Response(
+            {
+                "message": "Foydalanuvchi ma'lumotlari",
+                "data": ser.data
+            }
+        )
